@@ -1,9 +1,9 @@
 # ESR-Bench construction pipeline (reference)
 
-Reproduces how ESR-Bench is built from **public** GitHub issue threads and
-Wikipedia revisions. This is a **reference pipeline, not a turnkey one-click
-script**: it needs network access, an extraction LLM, and a DeepSeek API key,
-and the LLM stages are **non-deterministic** — it reproduces the construction
+Reproduces how ESR-Bench is built from public GitHub issue threads and
+Wikipedia revisions. This is a reference pipeline, not a turnkey one-click
+script: it needs network access, an extraction LLM, and a DeepSeek API key,
+and the LLM stages are non-deterministic — it reproduces the construction
 method and distribution, not the exact released rows.
 
 ## Stages (see `build_dataset.sh`)
@@ -15,15 +15,15 @@ method and distribution, not the exact released rows.
 QC: `extraction_coverage.py`.
 
 ### GitHub data has two parallel sub-pipelines (not one chain)
-The GitHub side combines two upstream sources that produce **different splits** and
-flow through **different normalizers**; running one does not feed the other.
-- **Main HF GitHub split** (legacy filename `pilot`, 1{,}698 QAs — the "1,698
+The GitHub side combines two upstream sources that produce different splits and
+flow through different normalizers; running one does not feed the other.
+- Main HF GitHub split (legacy filename `pilot`, 1{,}698 QAs — the "1,698
   GitHub" row of the paper's primary surface): pulled separately from a
   HuggingFace-mirrored JSONL of the `huggingface/datasets` issue stream into
   `$ESR_RAW_DIR/github_issues_esr/`, then normalized by `data_pipeline.py`.
-  `github_api_pull.py` does **not** populate this directory; see the docstring of
+  `github_api_pull.py` does not populate this directory; see the docstring of
   `data_pipeline.py` for the re-fetch source.
-- **Multi-repo split** (`multi_repo`, 252 QAs): pulled by `github_api_pull.py` over
+- Multi-repo split (`multi_repo`, 252 QAs): pulled by `github_api_pull.py` over
   the GitHub REST API into `$ESR_RAW_DIR/github_issues_esr_v2/<repo>/` for the
   held-out repos (pytorch, tensorflow, rust-lang, huggingface/transformers),
   then normalized by a separate multi-repo path (not `data_pipeline.py`).
@@ -37,11 +37,11 @@ flow through **different normalizers**; running one does not feed the other.
 - `ESR_RAW_DIR` — where fetched raw streams land (default: `$ESR_ROOT/data/raw`).
 
 ## Privacy
-Fetched raw streams stay local; the **public data release does not include raw
-thread/revision text** (see the data release's README). Re-fetch raw text only from
+Fetched raw streams stay local; the public data release does not include raw
+thread/revision text (see the data release's README). Re-fetch raw text only from
 the `source_manifest.jsonl` URLs.
 
-**The pipeline's `data/processed` output is NOT a publishable product as-is.** The
+The pipeline's `data/processed` output is NOT a publishable product as-is. The
 extraction stages emit `actor` and verbatim `span` fields and leave `@handle`
 mentions and personal URLs in free-text, so running this pipeline reproduces
 identifiable material locally. Before any redistribution you must (1) drop the
